@@ -1,36 +1,49 @@
 import requests
-import pickle
 
-
-def api():
 #Datos para la conexion a la API
-	user = "InternalSystems"
-	password ="s0SMDVvz36jl7ohi4kMgSHTm"
-	parametros = {"helpdesk_id": "424"}
+user = "InternalSystems"
+password ="s0SMDVvz36jl7ohi4kMgSHTm"
+parametros = {"helpdesk_id": "424"}
+
 
 #Conexion a la API
-	resp = requests.get('https://servicedesk.mercadolibre.com/api/v1/incidents.by.helpdesk?', params= parametros , auth= (user, password))
+resp = requests.get('https://servicedesk.mercadolibre.com/api/v1/incidents.by.helpdesk?', params= parametros , auth= (user, password)) #Listamos todos los tickets de la mesa
 #si esta OK se guarda la informacion
-	if resp.status_code != 200:
-		print "Error"
-	else:
-		lista = {}
-		lista = resp.json()
+if resp.status_code != 200:
+	print "Error"
+else:
+	lista = {}	
+	lista = resp.json()['requestIds'] #Guardo la informacion en un json y solicito el ID de los tickets
 
-#Almaceno la lista con los tickets de la mesa en otra lista
-	if lista.has_key('requestIds'):
-		tickets = []
-		tickets = lista['requestIds']
-		for i in tickets:
-			a = i
-			parametros2 = {"id": a}
-			sec = requests.get('https://servicedesk.mercadolibre.com/api/v1/incident', params= parametros2, auth = (user, password))
-			lista2 = {}
-			lista2 = sec.json()
-		
-			print lista2['category_id']
-			print "---------------------------------------------"
+for i in lista: #empiezo a iterar en mis tickets
+	tktOpen = requests.get('https://servicedesk.mercadolibre.com/api/v1/incident?id=' + i, auth= (user, password))
+	tktCat = tktOpen.json()['category_id'] #Categoria de los tickets
+	tktDes = tktOpen.json()['description'] #Descripcion de los tickets
+	tktId = tktOpen.json()['id'] #ID de los tickets
+	if tktCat == "904":
+		print tktDes
+#print "Hola Mundo!"
 
-print api()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
